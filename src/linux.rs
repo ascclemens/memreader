@@ -23,7 +23,7 @@ impl MemReader {
 impl ReadsMemory for MemReader {
   fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, c_int> {
     let mut file = self.get_memory_file()?;
-    file.seek(SeekFrom::Start(address as i64)).map_err(|_| -2)?;
+    file.seek(SeekFrom::Start(address as u64)).map_err(|_| -2)?;
     let mut bytes = Vec::with_capacity(n);
     file.read_exact(&mut bytes).map_err(|_| -3)?;
     Ok(bytes)

@@ -18,7 +18,7 @@ impl MemReader {
   }
 
   fn get_memory_file(&self) -> Result<File, c_int> {
-    File::open(&format!("/proc/{}/maps", self.pid)).map_err(|_| -1)
+    File::open(&format!("/proc/{}/mem", self.pid)).map_err(|_| -1)
   }
 }
 

@@ -25,7 +25,7 @@ impl ReadsMemory for MemReader {
     let mut file = self.get_memory_file()?;
     file.seek(SeekFrom::Start(address as u64)).map_err(|_| -2)?;
     let mut bytes = Vec::with_capacity(n);
-    file.read_exact(&mut bytes).map_err(|_| -3)?;
+    file.read(&mut bytes).map_err(|_| -3)?;
     Ok(bytes)
   }
 }

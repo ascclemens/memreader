@@ -15,7 +15,7 @@ fn main() {
   let address: usize = args[1].parse().unwrap();
   let n: usize = args[2].parse().unwrap();
 
-  let reader = MemReader::new(pid);
+  let reader = MemReader::new(pid).unwrap();
 
   println!("{:?}", reader.read_bytes(address, n));
 }

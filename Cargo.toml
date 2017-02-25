@@ -5,3 +5,4 @@ authors = ["Kyle Clemens <me@kyleclemens.com>"]
 
 [dependencies]
 libc = "0.2"
+cfg-if = "0.1"

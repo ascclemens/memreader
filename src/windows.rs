@@ -48,11 +48,11 @@ impl ReadsMemory for MemReader {
 }
 
 impl ProvidesSlices for MemReader {
-  fn address_slice<'a>(&'a self, start: usize, end: usize) -> MemorySlice<'a> {
+  fn address_slice(&self, start: usize, end: usize) -> MemorySlice {
     MemorySlice::new(self, start, end)
   }
 
-  fn address_slice_len<'a>(&'a self, start: usize, n: usize) -> MemorySlice<'a> {
+  fn address_slice_len(&self, start: usize, n: usize) -> MemorySlice {
     MemorySlice::new(self, start, start + n)
   }
 }

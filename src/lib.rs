@@ -31,9 +31,9 @@ trait ReadsMemory {
 
 pub trait ProvidesSlices {
   /// Create a slice representing the memory between the `start` and `end` addresses.
-  fn address_slice<'a>(&'a self, start: usize, end: usize) -> MemorySlice<'a>;
+  fn address_slice(&self, start: usize, end: usize) -> MemorySlice;
 
   /// Create a slice representing the memory between the `start` address and the address at
   /// `start + n`.
-  fn address_slice_len<'a>(&'a self, start: usize, n: usize) -> MemorySlice<'a>;
+  fn address_slice_len(&self, start: usize, n: usize) -> MemorySlice;
 }

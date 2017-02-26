@@ -2,7 +2,9 @@
 
 use libc::{c_int, c_uint, uintptr_t};
 use std::mem::uninitialized;
-use ReadsMemory;
+
+use {ReadsMemory, ProvidesSlices};
+use slice::MemorySlice;
 
 pub type natural_t = c_uint;
 pub type kern_return_t = c_int;
@@ -63,7 +65,7 @@ impl MemReader {
 
 impl ReadsMemory for MemReader {
   fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, c_int> {
-    let mut buf: Vec<u8> = Vec::with_capacity(n);
+    let mut buf: Vec<u8> = vec![0; n];
     let mut read: vm_size_t = unsafe { uninitialized() };
     let res = unsafe {
       vm_read_overwrite(self.port,
@@ -75,8 +77,17 @@ impl ReadsMemory for MemReader {
     if res != 0 {
       return Err(res);
     }
-    unsafe { buf.set_len(read as usize); }
     let copy = buf.to_vec();
     Ok(copy)
+  }
+}
+
+impl ProvidesSlices for MemReader {
+  fn address_slice<'a>(&'a self, start: usize, end: usize) -> MemorySlice<'a> {
+    MemorySlice::new(self, start, end)
+  }
+
+  fn address_slice_len<'a>(&'a self, start: usize, n: usize) -> MemorySlice<'a> {
+    MemorySlice::new(self, start, start + n)
   }
 }

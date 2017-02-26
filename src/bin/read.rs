@@ -1,7 +1,9 @@
 extern crate memreader;
 
 use std::env::args;
-use memreader::{MemReader, ReadsMemory};
+use std::io::Read;
+
+use memreader::{MemReader, ProvidesSlices};
 
 fn main() {
   let args: Vec<String> = args().skip(1).collect();
@@ -17,5 +19,7 @@ fn main() {
 
   let reader = MemReader::new(pid).unwrap();
 
-  println!("{:?}", reader.read_bytes(address, n));
+  let mut bytes: Vec<u8> = vec![0; n];
+  let res = reader.address_slice_len(address, n).read_exact(&mut bytes).unwrap();
+  println!("{:?}", res);
 }

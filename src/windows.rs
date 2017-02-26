@@ -28,8 +28,7 @@ impl MemReader {
 
 impl ReadsMemory for MemReader {
   fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, c_int> {
-    let mut buffer: Vec<u8> = Vec::with_capacity(n);
-    unsafe { buffer.set_len(n); }
+    let mut buffer: Vec<u8> = vec![0; n];
     let mut read: u64 = ::std::mem::uninitialized();
     let res = unsafe {
       ReadProcessMemory(self.handle,
@@ -45,5 +44,15 @@ impl ReadsMemory for MemReader {
       return Err(2);
     }
     Ok(buffer)
+  }
+}
+
+impl ProvidesSlices for MemReader {
+  fn address_slice<'a>(&'a self, start: usize, end: usize) -> MemorySlice<'a> {
+    MemorySlice::new(self, start, end)
+  }
+
+  fn address_slice_len<'a>(&'a self, start: usize, n: usize) -> MemorySlice<'a> {
+    MemorySlice::new(self, start, start + n)
   }
 }

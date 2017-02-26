@@ -32,6 +32,3 @@ pub trait ProvidesSlices {
 
   fn address_slice_len<'a>(&'a self, start: usize, n: usize) -> MemorySlice<'a>;
 }
-
-// MemReader::address_slice(start, end).read_to_end()
-// maybe make address_slice and have it implement std::io::Read?

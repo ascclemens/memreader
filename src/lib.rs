@@ -3,6 +3,7 @@ extern crate cfg_if;
 extern crate libc;
 
 pub mod slice;
+pub mod error;
 
 cfg_if! {
   if #[cfg(target_os = "macos")] {
@@ -20,15 +21,19 @@ cfg_if! {
 }
 
 use slice::MemorySlice;
+use error::*;
 
-pub trait ReadsMemory {
+trait ReadsMemory {
   /// Request `n` bytes from the memory at `address`. Returns a `Vec<u8>` containing the bytes
   /// received, which may or may not be equal to `n`.
-  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, libc::c_int>;
+  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>>;
 }
 
 pub trait ProvidesSlices {
+  /// Create a slice representing the memory between the `start` and `end` addresses.
   fn address_slice<'a>(&'a self, start: usize, end: usize) -> MemorySlice<'a>;
 
+  /// Create a slice representing the memory between the `start` address and the address at
+  /// `start + n`.
   fn address_slice_len<'a>(&'a self, start: usize, n: usize) -> MemorySlice<'a>;
 }

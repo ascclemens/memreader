@@ -5,29 +5,31 @@ use std::io::{Read, Seek, SeekFrom};
 use std::ptr::null;
 
 use ReadsMemory;
+use slice::MemorySlice;
+use error::*;
 
 pub struct MemReader {
   pid: u32
 }
 
 impl MemReader {
-  pub fn new(pid: u32) -> Result<MemReader, c_int> {
+  pub fn new(pid: u32) -> Result<MemReader> {
     Ok(MemReader {
       pid: pid
     })
   }
 
-  fn get_memory_file(&self) -> Result<File, c_int> {
-    File::open(&format!("/proc/{}/mem", self.pid)).map_err(|_| -1)
+  fn get_memory_file(&self) -> Result<File> {
+    File::open(&format!("/proc/{}/mem", self.pid)).map_err(|e| MemReaderError::Io(e))
   }
 }
 
 impl ReadsMemory for MemReader {
-  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, c_int> {
+  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>> {
     let mut file = self.get_memory_file()?;
-    file.seek(SeekFrom::Start(address as u64)).map_err(|_| -2)?;
+    file.seek(SeekFrom::Start(address as u64)).map_err(|e| MemReaderError::Io(e))?;
     let mut bytes: Vec<u8> = vec![0; n];
-    file.read_exact(&mut bytes).map_err(|_| -3)?;
+    file.read_exact(&mut bytes).map_err(|e| MemReaderError::Io(e))?;
     Ok(bytes)
   }
 }

@@ -7,6 +7,8 @@ use self::winapi::winnt::HANDLE;
 use libc::c_int;
 
 use ReadsMemory;
+use slice::MemorySlice;
+use error::*;
 
 struct MemReader {
   pid: u32,
@@ -14,10 +16,10 @@ struct MemReader {
 }
 
 impl MemReader {
-  fn new(pid: u32) -> Result<MemReader, c_int> {
+  fn new(pid: u32) -> Result<MemReader> {
     let handle = unsafe { OpenProcess(0x0010, false, pid) };
     if handle.is_null() {
-      return Err(1);
+      return Err(MemReaderError::Handle(None));
     }
     Ok(MemReader {
       pid: pid,
@@ -27,7 +29,7 @@ impl MemReader {
 }
 
 impl ReadsMemory for MemReader {
-  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, c_int> {
+  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>> {
     let mut buffer: Vec<u8> = vec![0; n];
     let mut read: u64 = ::std::mem::uninitialized();
     let res = unsafe {
@@ -38,10 +40,10 @@ impl ReadsMemory for MemReader {
         &mut read as *mut _)
     };
     if !res {
-      return Err(1);
+      return Err(MemReaderError::UnsuccessfulRead(Some(1)));
     }
     if read != n {
-      return Err(2);
+      return Err(MemReaderError::FewerBytesRead(read, buffer[..n].to_vec()));
     }
     Ok(buffer)
   }

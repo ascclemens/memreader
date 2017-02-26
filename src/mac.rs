@@ -5,6 +5,7 @@ use std::mem::uninitialized;
 
 use {ReadsMemory, ProvidesSlices};
 use slice::MemorySlice;
+use error::*;
 
 pub type natural_t = c_uint;
 pub type kern_return_t = c_int;
@@ -48,12 +49,12 @@ pub struct MemReader {
 }
 
 impl MemReader {
-  pub fn new(pid: u32) -> Result<MemReader, c_int> {
+  pub fn new(pid: u32) -> Result<MemReader> {
     let port = unsafe {
       let mut recv_port: mach_port_name_t = uninitialized();
       let res = task_for_pid(mach_task_self(), pid as c_int, &mut recv_port as *mut mach_port_name_t);
       if res != 0 {
-        return Err(res);
+        return Err(MemReaderError::Handle(Some(res as isize)));
       }
       recv_port
     };
@@ -64,7 +65,7 @@ impl MemReader {
 }
 
 impl ReadsMemory for MemReader {
-  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>, c_int> {
+  fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>> {
     let mut buf: Vec<u8> = vec![0; n];
     let mut read: vm_size_t = unsafe { uninitialized() };
     let res = unsafe {
@@ -75,9 +76,12 @@ impl ReadsMemory for MemReader {
         &mut read as *mut vm_size_t)
     };
     if res != 0 {
-      return Err(res);
+      return Err(MemReaderError::UnsuccessfulRead(Some(res as isize)));
     }
     let copy = buf.to_vec();
+    if read != n {
+      return Err(MemReaderError::FewerBytesRead(read, copy[..read].to_vec()));
+    }
     Ok(copy)
   }
 }

@@ -20,6 +20,6 @@ fn main() {
   let reader = MemReader::new(pid).unwrap();
 
   let mut bytes: Vec<u8> = vec![0; n];
-  let res = reader.address_slice_len(address, n).read_exact(&mut bytes).unwrap();
-  println!("{:?}", res);
+  reader.address_slice_len(address, n).read_exact(&mut bytes).unwrap();
+  println!("{:?}", bytes);
 }

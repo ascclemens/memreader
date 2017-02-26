@@ -4,20 +4,18 @@ extern crate winapi;
 use self::kernel32::{ReadProcessMemory, OpenProcess};
 use self::winapi::winnt::HANDLE;
 
-use libc::c_int;
-
-use ReadsMemory;
+use {ReadsMemory, ProvidesSlices};
 use slice::MemorySlice;
 use error::*;
 
-struct MemReader {
-  pid: u32,
+pub struct MemReader {
+  pub pid: u32,
   handle: HANDLE
 }
 
 impl MemReader {
-  fn new(pid: u32) -> Result<MemReader> {
-    let handle = unsafe { OpenProcess(0x0010, false, pid) };
+  pub fn new(pid: u32) -> Result<MemReader> {
+    let handle = unsafe { OpenProcess(0x0010, 0, pid) };
     if handle.is_null() {
       return Err(MemReaderError::Handle(None));
     }
@@ -31,19 +29,19 @@ impl MemReader {
 impl ReadsMemory for MemReader {
   fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>> {
     let mut buffer: Vec<u8> = vec![0; n];
-    let mut read: u64 = ::std::mem::uninitialized();
+    let mut read: u64 = unsafe { ::std::mem::uninitialized() };
     let res = unsafe {
       ReadProcessMemory(self.handle,
         address as *const _,
-        &mut buffer as *mut _,
-        n,
+        buffer.as_mut_ptr() as *mut _,
+        n as u64,
         &mut read as *mut _)
     };
-    if !res {
+    if res != 1 {
       return Err(MemReaderError::UnsuccessfulRead(Some(1)));
     }
-    if read != n {
-      return Err(MemReaderError::FewerBytesRead(read, buffer[..n].to_vec()));
+    if read != n as u64 {
+      return Err(MemReaderError::FewerBytesRead(read as usize, buffer[..n].to_vec()));
     }
     Ok(buffer)
   }

@@ -32,7 +32,7 @@ impl<'a> Read for MemorySlice<'a> {
     if start + buf_len > self.end {
       return Ok(0);
     }
-    let bytes = self.reader.read_bytes(start, buf_len).map_err(|_| IoError::from(IoErrorKind::Other))?;
+    let bytes = self.reader.read_bytes(start, buf_len).map_err(|e| IoError::new(IoErrorKind::Other, e))?;
     self.mark = Some(start + buf_len);
     for (i, byte) in bytes.iter().enumerate() {
       buf[i] = *byte;

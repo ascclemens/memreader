@@ -1,5 +1,7 @@
+use std::error::Error;
 use std::result::Result as StdResult;
 use std::io::Error as IoError;
+use std::fmt;
 
 pub type Result<T> = StdResult<T, MemReaderError>;
 
@@ -25,4 +27,20 @@ pub enum MemReaderError {
 
   /// Another error, represented by a code.
   Other(isize)
+}
+
+impl fmt::Display for MemReaderError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fmt::Debug::fmt(self, f)
+  }
+}
+
+impl Error for MemReaderError {
+    fn description(&self) -> &str {
+      ""
+    }
+
+    fn cause(&self) -> Option<&Error> {
+      None
+    }
 }

@@ -3,8 +3,10 @@ use std::result::Result as StdResult;
 use std::io::Error as IoError;
 use std::fmt;
 
+/// Result type for `MemReaderError`.
 pub type Result<T> = StdResult<T, MemReaderError>;
 
+/// An error when using `MemReader`.
 #[derive(Debug)]
 pub enum MemReaderError {
   /// Fewer bytes were read from memory than were requested.

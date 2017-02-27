@@ -23,12 +23,14 @@ cfg_if! {
 use slice::MemorySlice;
 use error::*;
 
+/// Internal trait for reading memory at an address.
 trait ReadsMemory {
   /// Request `n` bytes from the memory at `address`. Returns a `Vec<u8>` containing the bytes
   /// received, which may or may not be equal to `n`.
   fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>>;
 }
 
+/// This trait allows for providing `MemorySlice`s that can read memory in that slice.
 pub trait ProvidesSlices {
   /// Create a slice representing the memory between the `start` and `end` addresses.
   fn address_slice(&self, start: usize, end: usize) -> MemorySlice;

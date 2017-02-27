@@ -36,7 +36,7 @@ impl ReadsMemory for MemReader {
         &mut read as *mut _)
     };
     if res != 1 {
-      return Err(MemReaderError::UnsuccessfulRead(Some(1)));
+      return Err(MemReaderError::UnsuccessfulRead(Some(res)));
     }
     if read != n as u64 {
       return Err(MemReaderError::FewerBytesRead(read as usize, buffer[..n].to_vec()));

@@ -2,6 +2,12 @@
 name = "memreader"
 version = "0.1.0"
 authors = ["Kyle Clemens <me@kyleclemens.com>"]
+description = "A library crate designed to read memory from other processes"
+license = "MPL-2.0"
+documentation = "https://docs.rs/crate/memreader"
+repository = "https://github.com/jkcclemens/memreader"
+readme = "README.md"
+keywords = ["memory"]
 
 [dependencies]
 libc = "0.2"

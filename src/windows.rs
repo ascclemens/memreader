@@ -9,7 +9,6 @@ use slice::MemorySlice;
 use error::*;
 
 pub struct MemReader {
-  pub pid: u32,
   handle: HANDLE
 }
 
@@ -20,7 +19,6 @@ impl MemReader {
       return Err(MemReaderError::Handle(None));
     }
     Ok(MemReader {
-      pid: pid,
       handle: handle
     })
   }

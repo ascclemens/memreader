@@ -5,8 +5,8 @@ use std::io::ErrorKind as IoErrorKind;
 use {MemReader, ReadsMemory};
 
 pub struct MemorySlice<'a> {
-  pub start: usize,
-  pub end: usize,
+  start: usize,
+  end: usize,
   reader: &'a MemReader,
   mark: Option<usize>
 }
@@ -19,6 +19,16 @@ impl<'a> MemorySlice<'a> {
       reader: reader,
       mark: None
     }
+  }
+
+  /// The start address of this slice.
+  pub fn start(&self) -> usize {
+    self.start
+  }
+
+  /// The end address of this slice.
+  pub fn end(&self) -> usize {
+    self.end
   }
 }
 

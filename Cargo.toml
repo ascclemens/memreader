@@ -1,6 +1,6 @@
 [package]
 name = "memreader"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Kyle Clemens <me@kyleclemens.com>"]
 description = "A library crate designed to read memory from other processes"
 license = "MPL-2.0"

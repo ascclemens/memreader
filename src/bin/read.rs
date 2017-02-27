@@ -14,7 +14,14 @@ fn main() {
   }
 
   let pid: u32 = args[0].parse().unwrap();
-  let address: usize = args[1].parse().unwrap();
+  let address: usize = match args[1].parse() {
+    Ok(a) => a,
+    Err(_) => if args[1].starts_with("0x") {
+      usize::from_str_radix(&args[1][2..], 16).unwrap()
+    } else {
+      panic!("could not parse address as usize or usize hex string");
+    }
+  };
   let n: usize = args[2].parse().unwrap();
 
   let reader = MemReader::new(pid).unwrap();

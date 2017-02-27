@@ -1,10 +1,7 @@
-use libc::c_int;
-
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
-use std::ptr::null;
 
-use ReadsMemory;
+use {ReadsMemory, ProvidesSlices};
 use slice::MemorySlice;
 use error::*;
 

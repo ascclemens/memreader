@@ -1,15 +1,15 @@
 extern crate kernel32;
-extern crate winapi;
 
 use self::kernel32::{ReadProcessMemory, OpenProcess};
-use self::winapi::winnt::HANDLE;
+
+use std::sync::atomic::{AtomicPtr, Ordering};
 
 use {ReadsMemory, ProvidesSlices};
 use slice::MemorySlice;
 use error::*;
 
 pub struct MemReader {
-  handle: HANDLE
+  handle: AtomicPtr<::std::os::raw::c_void>
 }
 
 impl MemReader {
@@ -19,7 +19,7 @@ impl MemReader {
       return Err(MemReaderError::Handle(None));
     }
     Ok(MemReader {
-      handle: handle
+      handle: AtomicPtr::new(handle)
     })
   }
 }
@@ -29,14 +29,14 @@ impl ReadsMemory for MemReader {
     let mut buffer: Vec<u8> = vec![0; n];
     let mut read: u64 = unsafe { ::std::mem::uninitialized() };
     let res = unsafe {
-      ReadProcessMemory(self.handle,
+      ReadProcessMemory(self.handle.load(Ordering::Relaxed),
         address as *const _,
         buffer.as_mut_ptr() as *mut _,
         n as u64,
         &mut read as *mut _)
     };
     if res != 1 {
-      return Err(MemReaderError::UnsuccessfulRead(Some(res)));
+      return Err(MemReaderError::UnsuccessfulRead(Some(res as isize)));
     }
     if read != n as u64 {
       return Err(MemReaderError::FewerBytesRead(read as usize, buffer[..n].to_vec()));

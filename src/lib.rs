@@ -4,6 +4,7 @@ extern crate libc;
 
 pub mod slice;
 pub mod error;
+pub mod prelude;
 
 cfg_if! {
   if #[cfg(target_os = "macos")] {
@@ -30,6 +31,14 @@ trait ReadsMemory {
   fn read_bytes(&self, address: usize, n: usize) -> Result<Vec<u8>>;
 }
 
+pub trait ConstructsMemReader {
+  fn new(pid: u32) -> Result<MemReader>;
+}
+
+trait IsMemReader: ConstructsMemReader + ProvidesSlices + ProvidesBaseAddresses {}
+
+impl IsMemReader for MemReader {}
+
 /// This trait allows for providing `MemorySlice`s that can read memory in that slice.
 pub trait ProvidesSlices {
   /// Create a slice representing the memory between the `start` and `end` addresses.
@@ -38,4 +47,8 @@ pub trait ProvidesSlices {
   /// Create a slice representing the memory between the `start` address and the address at
   /// `start + n`.
   fn address_slice_len(&self, start: usize, n: usize) -> MemorySlice;
+}
+
+pub trait ProvidesBaseAddresses {
+  fn base_address(&self, process_name: &str) -> Result<usize>;
 }

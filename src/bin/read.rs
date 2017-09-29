@@ -3,7 +3,7 @@ extern crate memreader;
 use std::env::args;
 use std::io::Read;
 
-use memreader::{MemReader, ProvidesSlices};
+use memreader::prelude::*;
 
 fn main() {
   let args: Vec<String> = args().skip(1).collect();

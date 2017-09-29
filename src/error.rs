@@ -27,6 +27,8 @@ pub enum MemReaderError {
   /// An IO error occurred and is included.
   Io(IoError),
 
+  CString,
+
   /// Another error, represented by a code.
   Other(isize)
 }
